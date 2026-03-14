@@ -65,7 +65,25 @@ export default function ShippingDashboard() {
             <div className="w-1.5 h-5 rounded-full bg-rose-400" />
             <h1 className="text-2xl font-black text-white tracking-tight">Shipping Deck</h1>
           </div>
-          <p className="text-sm text-zinc-500 ml-4">Order dispatch & delivery management</p>
+          <p className="text-sm text-zinc-500 mb-4">Order dispatch & delivery management</p>
+          
+          <div className="flex gap-3 mt-2">
+            <button 
+              onClick={() => document.getElementById('pending-dispatch')?.scrollIntoView({ behavior: 'smooth' })}
+              className="px-5 py-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-[10px] font-black text-amber-500 uppercase tracking-[0.15em] hover:bg-amber-500/20 transition-all flex items-center gap-2 group"
+            >
+              <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+              Access Pending Dispatch
+              <span className="bg-amber-500/20 px-2 py-0.5 rounded-md ml-1 group-hover:bg-amber-500/30 transition-colors">{pendingOrders.length}</span>
+            </button>
+            <button 
+              onClick={() => document.getElementById('operational-workspace')?.scrollIntoView({ behavior: 'smooth' })}
+              className="px-5 py-2.5 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black text-indigo-400 uppercase tracking-[0.15em] hover:bg-indigo-500/20 transition-all flex items-center gap-2 group"
+            >
+              <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
+              Live Workspace
+            </button>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <div className="glass-card px-4 py-2 text-center">
@@ -83,11 +101,75 @@ export default function ShippingDashboard() {
         </div>
       </div>
 
+      {/* ══════ OPERATIONAL WORKSPACE ══════ */}
+      <div id="operational-workspace" className="mb-10 p-6 rounded-[2rem] bg-indigo-500/5 border border-indigo-500/10 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent" />
+        
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
+              <Truck size={20} className="text-indigo-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-black text-white uppercase tracking-wider">In Transit Workspace</h2>
+              <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Active Delivery Tracking</p>
+            </div>
+          </div>
+          <span className="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black text-indigo-400">
+            {dispatchedOrders.length} ORDERS LIVE
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {dispatchedOrders.map(order => (
+            <div key={order._id} className="glass-card p-5 relative group transition-all duration-300 hover:border-indigo-500/30">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="text-sm font-bold text-white">{order.customer_name}</h3>
+                  <p className="text-[10px] text-indigo-400 font-mono mt-0.5">{order.tracking_id}</p>
+                </div>
+                <div className="flex flex-col items-end">
+                  <span className="text-[9px] font-black text-zinc-600 uppercase tracking-tighter">{order.courier_name}</span>
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse mt-1 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                </div>
+              </div>
+              
+              <div className="h-px w-full bg-white/5 mb-4" />
+              
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex flex-col">
+                  <span className="text-[8px] font-black text-zinc-600 uppercase">Destination</span>
+                  <span className="text-[11px] text-zinc-400 truncate max-w-[120px]">{order.delivery_address}</span>
+                </div>
+                <div className="flex flex-col items-end">
+                  <span className="text-[8px] font-black text-zinc-600 uppercase">Dispatch Date</span>
+                  <span className="text-[11px] text-zinc-400">{new Date(order.updatedAt).toLocaleDateString()}</span>
+                </div>
+              </div>
+
+              <button onClick={() => markDelivered(order._id)} disabled={delivering === order._id}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-[11px] font-black text-white uppercase tracking-widest transition-all duration-300 relative overflow-hidden group/btn"
+                style={{ background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', boxShadow: '0 4px 15px rgba(16,185,129,0.2)' }}>
+                <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-500" />
+                {delivering === order._id ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
+                {delivering === order._id ? 'Verifying...' : 'Complete Delivery'}
+              </button>
+            </div>
+          ))}
+          {dispatchedOrders.length === 0 && (
+            <div className="col-span-full py-12 flex flex-col items-center justify-center text-center border-2 border-dashed border-white/5 rounded-2xl">
+              <Truck size={32} className="text-zinc-800 mb-2" />
+              <p className="text-[10px] font-black text-zinc-700 uppercase tracking-[0.2em]">Zero Live Shipments</p>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* ══════ PENDING DISPATCH ══════ */}
-      <div className="mb-10">
+      <div id="pending-dispatch" className="mb-10">
         <div className="flex items-center gap-2.5 mb-5">
           <div className="w-1 h-4 rounded-full bg-amber-400" />
-          <h2 className="text-lg font-bold text-white tracking-tight">Pending Dispatch</h2>
+          <h2 className="text-sm font-black text-white uppercase tracking-widest">Pending Dispatch</h2>
           <span className="text-[10px] font-bold text-zinc-600 px-2 py-0.5 rounded-full bg-white/[0.03] border border-white/[0.06]">{pendingOrders.length}</span>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -157,103 +239,27 @@ export default function ShippingDashboard() {
         </div>
       </div>
 
-      {/* ══════ PENDING DELIVERY (in transit) ══════ */}
-      <div className="mb-10">
-        <div className="flex items-center gap-2.5 mb-5">
-          <div className="w-1 h-4 rounded-full bg-orange-400" />
-          <h2 className="text-lg font-bold text-white tracking-tight">Pending Delivery</h2>
-          <span className="text-[10px] font-bold text-zinc-600 px-2 py-0.5 rounded-full bg-white/[0.03] border border-white/[0.06]">{dispatchedOrders.length}</span>
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          {dispatchedOrders.map(order => (
-            <div key={order._id} className="glass-card p-5 relative overflow-hidden transition-all duration-300 hover:translate-y-[-1px]" style={{ borderColor: 'rgba(251,146,60,0.15)' }}>
-              <div className="absolute top-0 right-0 w-20 h-20 pointer-events-none" style={{ background: 'radial-gradient(circle at top right, rgba(251,146,60,0.06), transparent)' }} />
-              <div className="flex justify-between items-start mb-4 relative z-10">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'rgba(251,146,60,0.1)', border: '1px solid rgba(251,146,60,0.2)' }}>
-                    <Truck size={16} className="text-orange-400" />
-                  </div>
-                  <div>
-                    <h3 className="text-[13px] font-bold text-white leading-none">{order.customer_name}</h3>
-                    <span className="text-[10px] text-zinc-600 flex items-center gap-1 mt-1"><Clock size={9} /> {new Date(order.updatedAt || order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
-                  </div>
-                </div>
-                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1" style={{ background: 'rgba(251,146,60,0.1)', border: '1px solid rgba(251,146,60,0.2)', color: '#fb923c' }}><span className="w-1 h-1 rounded-full bg-orange-400 animate-pulse" />In Transit</span>
-              </div>
-              <div className="space-y-2 relative z-10 mb-4">
-                <div className="flex items-center justify-between p-2.5 rounded-lg" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.03)' }}>
-                  <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Courier</span>
-                  <span className="text-[11px] font-semibold text-white">{order.courier_name}</span>
-                </div>
-                <div className="flex items-center justify-between p-2.5 rounded-lg" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.03)' }}>
-                  <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Tracking</span>
-                  <span className="text-[11px] font-semibold text-orange-400 font-mono">{order.tracking_id}</span>
-                </div>
-                <div className="flex items-center justify-between p-2.5 rounded-lg" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.03)' }}>
-                  <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Address</span>
-                  <span className="text-[11px] text-zinc-400 text-right max-w-[60%]">{order.delivery_address}</span>
-                </div>
-              </div>
-              <button onClick={() => markDelivered(order._id)} disabled={delivering === order._id}
-                className="w-full relative z-10 flex items-center justify-center gap-2 py-2.5 rounded-xl text-[12px] font-bold text-white transition-all duration-200 active:scale-[0.98] disabled:opacity-50"
-                style={{ background: 'linear-gradient(135deg, #16a34a, #15803d)', boxShadow: '0 4px 20px rgba(22,163,74,0.3), inset 0 1px 0 rgba(255,255,255,0.1)' }}>
-                {delivering === order._id ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
-                {delivering === order._id ? 'Confirming...' : 'Mark as Delivered'}
-              </button>
-            </div>
-          ))}
-          {dispatchedOrders.length === 0 && (
-            <div className="col-span-full py-12 glass-card flex flex-col items-center text-center" style={{ borderStyle: 'dashed' }}>
-              <Truck size={24} className="text-zinc-700 mb-2" />
-              <p className="text-xs text-zinc-600">No orders in transit.</p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* ══════ DELIVERED ══════ */}
-      <div className="mt-10">
+      {/* ══════ COMPLETED DELIVERIES ══════ */}
+      <div>
         <div className="flex items-center gap-2.5 mb-5">
           <div className="w-1 h-4 rounded-full bg-violet-400" />
-          <h2 className="text-lg font-bold text-white tracking-tight">Delivered</h2>
+          <h2 className="text-sm font-black text-white uppercase tracking-widest">Completed Deliveries</h2>
           <span className="text-[10px] font-bold text-zinc-600 px-2 py-0.5 rounded-full bg-white/[0.03] border border-white/[0.06]">{deliveredOrders.length}</span>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-          {deliveredOrders.map(order => (
-            <div key={order._id} className="glass-card p-5 relative overflow-hidden transition-all duration-300 hover:translate-y-[-1px]" style={{ borderColor: 'rgba(139,92,246,0.15)' }}>
-              <div className="absolute top-0 right-0 w-20 h-20 pointer-events-none" style={{ background: 'radial-gradient(circle at top right, rgba(139,92,246,0.06), transparent)' }} />
-              <div className="flex justify-between items-start mb-4 relative z-10">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.2)' }}>
-                    <CircleCheckBig size={16} className="text-violet-400" />
-                  </div>
-                  <div>
-                    <h3 className="text-[13px] font-bold text-white leading-none">{order.customer_name}</h3>
-                    <span className="text-[10px] text-zinc-600 flex items-center gap-1 mt-1"><Clock size={9} /> {new Date(order.updatedAt || order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
-                  </div>
-                </div>
-                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1" style={{ background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.2)', color: '#a78bfa' }}><span className="w-1 h-1 rounded-full bg-violet-400" />Delivered</span>
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4">
+          {deliveredOrders.slice(0, 8).map(order => (
+            <div key={order._id} className="glass-card p-4 flex flex-col gap-2 border-violet-500/10">
+              <div className="flex justify-between items-center">
+                <span className="text-[11px] font-bold text-white truncate max-w-[120px]">{order.customer_name}</span>
+                <CheckCircle2 size={12} className="text-violet-400" />
               </div>
-              <div className="space-y-2 relative z-10">
-                <div className="flex items-center justify-between p-2.5 rounded-lg" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.03)' }}>
-                  <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Courier</span>
-                  <span className="text-[11px] font-semibold text-white">{order.courier_name}</span>
-                </div>
-                <div className="flex items-center justify-between p-2.5 rounded-lg" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.03)' }}>
-                  <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Tracking</span>
-                  <span className="text-[11px] font-semibold text-violet-400 font-mono">{order.tracking_id}</span>
-                </div>
-              </div>
-              <div className="mt-3 flex items-center gap-1.5 text-[10px] text-violet-400 relative z-10">
-                <CircleCheckBig size={11} />
-                <span className="font-semibold">Delivery confirmed</span>
-              </div>
+              <p className="text-[9px] text-zinc-600 font-mono truncate">{order.tracking_id}</p>
+              <span className="text-[8px] font-black text-violet-500/50 uppercase tracking-widest">Successful Delivery</span>
             </div>
           ))}
           {deliveredOrders.length === 0 && (
-            <div className="col-span-full py-12 glass-card flex flex-col items-center text-center" style={{ borderStyle: 'dashed' }}>
-              <CircleCheckBig size={24} className="text-zinc-700 mb-2" />
-              <p className="text-xs text-zinc-600">No delivered orders yet.</p>
+            <div className="col-span-full py-8 text-center border border-dashed border-white/5 rounded-2xl">
+              <p className="text-[9px] font-black text-zinc-800 uppercase tracking-widest">History Empty</p>
             </div>
           )}
         </div>

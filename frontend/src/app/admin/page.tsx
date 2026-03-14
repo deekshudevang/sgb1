@@ -54,21 +54,23 @@ export default function AdminDashboard() {
   const created = orders.filter(o => o.status === 'ORDER_CREATED').length;
   const packed = orders.filter(o => o.status === 'PACKED').length;
   const shipped = orders.filter(o => o.status === 'SHIPPED').length;
+  const delivered = orders.filter(o => o.status === 'DELIVERED').length;
 
   const kpis = [
     { l: 'Total Orders', v: total, icon: Boxes, c: 'text-brand-400', bg: 'bg-brand-500/8 border-brand-500/15', g: '#6366f1' },
     { l: 'Pending', v: created, icon: Package, c: 'text-blue-400', bg: 'bg-blue-500/8 border-blue-500/15', g: '#3b82f6' },
-    { l: 'Packed', v: packed, icon: Clock, c: 'text-amber-400', bg: 'bg-amber-500/8 border-amber-500/15', g: '#f59e0b' },
-    { l: 'Shipped', v: shipped, icon: Truck, c: 'text-emerald-400', bg: 'bg-emerald-500/8 border-emerald-500/15', g: '#10b981' },
+    { l: 'In Transit', v: shipped, icon: Truck, c: 'text-orange-400', bg: 'bg-orange-500/8 border-orange-500/15', g: '#fb923c' },
+    { l: 'Delivered', v: delivered, icon: Clock, c: 'text-emerald-400', bg: 'bg-emerald-500/8 border-emerald-500/15', g: '#10b981' },
   ];
 
   const getStatusBadge = (s: string) => {
     if (s === 'ORDER_CREATED') return <span className="badge badge-created"><span className="w-1 h-1 rounded-full bg-blue-400 animate-pulse" />Created</span>;
     if (s === 'PACKED') return <span className="badge badge-packed"><span className="w-1 h-1 rounded-full bg-amber-400" />Packed</span>;
-    if (s === 'SHIPPED') return <span className="badge badge-shipped"><span className="w-1 h-1 rounded-full bg-emerald-400" />Shipped</span>;
+    if (s === 'SHIPPED') return <span className="badge badge-shipped"><span className="w-1 h-1 rounded-full bg-orange-400" />In Transit</span>;
+    if (s === 'DELIVERED') return <span className="badge badge-shipped" style={{ color: '#10b981', borderColor: 'rgba(16,185,129,0.2)', backgroundColor: 'rgba(16,185,129,0.05)' }}><span className="w-1 h-1 rounded-full bg-emerald-400" />Delivered</span>;
   };
 
-  const filters = ['ALL', 'ORDER_CREATED', 'PACKED', 'SHIPPED'];
+  const filters = ['ALL', 'ORDER_CREATED', 'PACKED', 'SHIPPED', 'DELIVERED'];
 
   return (
     <DashboardLayout>
@@ -114,18 +116,44 @@ export default function AdminDashboard() {
           <div className="flex justify-between text-[10px] font-bold text-zinc-600 uppercase tracking-wider mb-2.5">
             <span className="flex items-center gap-1.5"><Circle size={8} className="text-blue-400 fill-blue-400" />Created ({created})</span>
             <span className="flex items-center gap-1.5"><Circle size={8} className="text-amber-400 fill-amber-400" />Packed ({packed})</span>
-            <span className="flex items-center gap-1.5"><Circle size={8} className="text-emerald-400 fill-emerald-400" />Shipped ({shipped})</span>
+            <span className="flex items-center gap-1.5"><Circle size={8} className="text-orange-400 fill-orange-400" />In Transit ({shipped})</span>
+            <span className="flex items-center gap-1.5"><Circle size={8} className="text-emerald-400 fill-emerald-400" />Delivered ({delivered})</span>
           </div>
           <div className="flex h-1.5 rounded-full gap-px bg-white/[0.05] overflow-hidden">
             {created > 0 && <div className="h-full rounded-l-full transition-all" style={{ width: `${(created/total)*100}%`, background: 'linear-gradient(90deg, #3b82f6, #6366f1)' }} />}
             {packed > 0 && <div className="h-full transition-all" style={{ width: `${(packed/total)*100}%`, background: '#f59e0b' }} />}
-            {shipped > 0 && <div className="h-full rounded-r-full transition-all" style={{ width: `${(shipped/total)*100}%`, background: 'linear-gradient(90deg, #10b981, #059669)' }} />}
+            {shipped > 0 && <div className="h-full transition-all" style={{ width: `${(shipped/total)*100}%`, background: '#fb923c' }} />}
+            {delivered > 0 && <div className="h-full rounded-r-full transition-all" style={{ width: `${(delivered/total)*100}%`, background: 'linear-gradient(90deg, #10b981, #059669)' }} />}
           </div>
-          <div className="flex justify-end mt-2">
-            <div className="flex items-center gap-1.5 text-[10px] text-zinc-600">
-              <TrendingUp size={10} className="text-emerald-500" />
-              <span>{total > 0 ? Math.round((shipped/total)*100) : 0}% fulfillment rate</span>
-            </div>
+        </div>
+      )}
+
+      {/* Pending Delivery (In Transit) Section - Moved to Workspace */}
+      {shipped > 0 && (
+        <div className="mb-8">
+          <div className="flex items-center gap-2.5 mb-4">
+            <div className="w-1 h-4 rounded-full bg-orange-400" />
+            <h2 className="text-sm font-black text-white uppercase tracking-widest">Pending Delivery (In Transit)</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {orders.filter(o => o.status === 'SHIPPED').slice(0, 3).map(order => (
+              <div key={order._id} className="glass-card p-4 border-orange-500/10 flex flex-col gap-3">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-[11px] font-bold text-white">{order.customer_name}</p>
+                    <p className="text-[9px] text-zinc-500 font-mono italic">{order.tracking_id}</p>
+                  </div>
+                  <Truck size={14} className="text-orange-400" />
+                </div>
+                <div className="flex items-center justify-between text-[10px]">
+                  <span className="text-zinc-600 uppercase tracking-tighter font-bold">{order.courier_name}</span>
+                  <span className="text-orange-400 font-bold flex items-center gap-1">
+                    <span className="w-1 h-1 rounded-full bg-orange-400 animate-pulse" />
+                    IN TRANSIT
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -189,7 +217,7 @@ export default function AdminDashboard() {
                 </td>
                 <td className="px-6 py-4">{getStatusBadge(order.status)}</td>
                 <td className="px-6 py-4">
-                  {order.status === 'SHIPPED' ? (
+                  {order.status === 'SHIPPED' || order.status === 'DELIVERED' ? (
                     <div>
                       <div className="text-zinc-300 text-[11px] font-semibold">{order.courier_name}</div>
                       <div className="text-zinc-600 text-[11px] font-mono mt-0.5">{order.tracking_id}</div>

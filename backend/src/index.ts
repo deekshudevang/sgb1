@@ -9,11 +9,14 @@ import connectDB from './config/db';
 import userRoutes from './routes/userRoutes';
 import orderRoutes from './routes/orderRoutes';
 import shippingRoutes from './routes/shippingRoutes';
-
-// Connect to MongoDB
 connectDB();
 
 const app = express();
+
+app.use((req: Request, res: Response, next: any) => {
+  console.log(`[REQ] ${req.method} ${req.url}`);
+  next();
+});
 
 // Middleware
 app.use(cors());
@@ -28,6 +31,21 @@ app.use('/api/shipping', shippingRoutes);
 // Health check
 app.get('/', (req: Request, res: Response) => {
   res.json({ status: 'ok', service: 'SGB Workflow API', version: '1.0.0' });
+});
+
+// 404 Handler
+app.use((req: Request, res: Response) => {
+  console.log(`[404] ${req.method} ${req.url}`);
+  res.status(404).json({ message: `Route ${req.method} ${req.url} not found` });
+});
+
+// Error Handler
+app.use((err: any, req: Request, res: Response, next: any) => {
+  console.error('[CRITICAL ERROR]', err);
+  res.status(500).json({ 
+    message: err.message || 'Internal Server Error',
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+  });
 });
 
 const PORT = process.env.PORT || 5000;

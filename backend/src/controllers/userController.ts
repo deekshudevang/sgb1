@@ -6,7 +6,7 @@ import { AuthRequest } from '../middleware/authMiddleware';
 // @desc    Auth user & get token
 // @route   POST /api/users/login
 export const authUser = async (req: Request, res: Response): Promise<void> => {
-  const { email, password } = req.body;
+  const { email, password } = req.body || {};
   try {
     const user = await User.findOne({ email });
     if (user && (await user.matchPassword(password))) {
