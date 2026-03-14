@@ -32,12 +32,13 @@ export default function WorkflowMap() {
         const created = data.filter((o: any) => o.status === 'ORDER_CREATED').length;
         const packed = data.filter((o: any) => o.status === 'PACKED').length;
         const shipped = data.filter((o: any) => o.status === 'SHIPPED').length;
+        const delivered = data.filter((o: any) => o.status === 'DELIVERED').length;
         setTotal(data.length);
         setStages([
-          { id: 'created', label: 'Order Placed', count: created, icon: Package, color: 'text-blue-400', glow: 'rgba(59,130,246,0.15)', borderColor: 'rgba(59,130,246,0.3)', bgColor: 'rgba(59,130,246,0.06)' },
-          { id: 'packed', label: 'Packaging', count: packed, icon: Box, color: 'text-amber-400', glow: 'rgba(245,158,11,0.15)', borderColor: 'rgba(245,158,11,0.3)', bgColor: 'rgba(245,158,11,0.06)' },
-          { id: 'shipped', label: 'Shipped', count: shipped, icon: Truck, color: 'text-emerald-400', glow: 'rgba(16,185,129,0.15)', borderColor: 'rgba(16,185,129,0.3)', bgColor: 'rgba(16,185,129,0.06)' },
-          { id: 'delivered', label: 'Delivered', count: 0, icon: CheckCircle2, color: 'text-violet-400', glow: 'rgba(139,92,246,0.15)', borderColor: 'rgba(139,92,246,0.3)', bgColor: 'rgba(139,92,246,0.06)' },
+          { id: 'created', label: 'Order Created', count: created, icon: Package, color: 'text-blue-400', glow: 'rgba(59,130,246,0.15)', borderColor: 'rgba(59,130,246,0.3)', bgColor: 'rgba(59,130,246,0.06)' },
+          { id: 'packed', label: 'Packed', count: packed, icon: Box, color: 'text-rose-400', glow: 'rgba(244,63,94,0.15)', borderColor: 'rgba(244,63,94,0.3)', bgColor: 'rgba(244,63,94,0.06)' },
+          { id: 'shipped', label: 'In Transit', count: shipped, icon: Truck, color: 'text-yellow-400', glow: 'rgba(234,179,8,0.15)', borderColor: 'rgba(234,179,8,0.3)', bgColor: 'rgba(234,179,8,0.06)' },
+          { id: 'delivered', label: 'Delivered', count: delivered, icon: CheckCircle2, color: 'text-emerald-400', glow: 'rgba(16,185,129,0.15)', borderColor: 'rgba(16,185,129,0.3)', bgColor: 'rgba(16,185,129,0.06)' },
         ]);
         setLoading(false);
       } catch (err) { console.error(err); }
