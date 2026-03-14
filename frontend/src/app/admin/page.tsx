@@ -4,7 +4,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuthStore } from '@/store/authStore';
-import { Package, Download, Boxes, Truck, Clock, Search, TrendingUp, Circle } from 'lucide-react';
+import { Package, Download, Boxes, Truck, Clock, Search, TrendingUp, Circle, CheckCircle2, CircleCheckBig } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function AdminDashboard() {
@@ -16,11 +16,25 @@ export default function AdminDashboard() {
   const { user } = useAuthStore();
   const router = useRouter();
 
+  const fetchOrders = async () => {
+    try {
+      const r = await axios.get('http://localhost:5000/api/orders', {
+        headers: { Authorization: `Bearer ${user?.token}` }
+      });
+      setOrders(r.data);
+      if (!search && statusFilter === 'ALL') setFiltered(r.data);
+    } catch (error) {
+      console.error('Failed to fetch orders:', error);
+    }
+  };
+
   useEffect(() => {
     if (!user) return;
-    axios.get('http://localhost:5000/api/orders', {
-      headers: { Authorization: `Bearer ${user.token}` }
-    }).then(r => { setOrders(r.data); setFiltered(r.data); });
+    fetchOrders();
+    
+    // Auto-sync mechanism (30 seconds)
+    const interval = setInterval(fetchOrders, 30000);
+    return () => clearInterval(interval);
   }, [user]);
 
   useEffect(() => {
@@ -84,6 +98,9 @@ export default function AdminDashboard() {
           <p className="text-sm text-zinc-500 ml-4">Real-time order lifecycle · All departments</p>
         </div>
         <div className="flex gap-2.5">
+          <button onClick={fetchOrders} className="btn-ghost flex items-center gap-2 group">
+            <Clock size={14} className="group-hover:rotate-180 transition-transform duration-500" /> Sync Data
+          </button>
           <button onClick={handleExport} className="btn-ghost flex items-center gap-2">
             <Download size={14} /> Export CSV
           </button>
@@ -128,35 +145,68 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Pending Delivery (In Transit) Section - Moved to Workspace */}
-      {shipped > 0 && (
-        <div className="mb-8">
-          <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-1 h-4 rounded-full bg-orange-400" />
-            <h2 className="text-sm font-black text-white uppercase tracking-widest">Pending Delivery (In Transit)</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {orders.filter(o => o.status === 'SHIPPED').slice(0, 3).map(order => (
-              <div key={order._id} className="glass-card p-4 border-orange-500/10 flex flex-col gap-3">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-[11px] font-bold text-white">{order.customer_name}</p>
-                    <p className="text-[9px] text-zinc-500 font-mono italic">{order.tracking_id}</p>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* Pending Delivery (In Transit) */}
+        {shipped > 0 && (
+          <div>
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="w-1 h-4 rounded-full bg-orange-400" />
+              <h2 className="text-sm font-black text-white uppercase tracking-widest">In Transit</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {orders.filter(o => o.status === 'SHIPPED').slice(0, 4).map(order => (
+                <div key={order._id} className="glass-card p-4 border-orange-500/10 flex flex-col gap-3 group transition-all hover:translate-y-[-2px]">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-[11px] font-bold text-white group-hover:text-orange-400 transition-colors uppercase">{order.customer_name}</p>
+                      <p className="text-[9px] text-zinc-500 font-mono italic">{order.tracking_id}</p>
+                    </div>
+                    <Truck size={14} className="text-orange-400" />
                   </div>
-                  <Truck size={14} className="text-orange-400" />
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="text-zinc-600 uppercase tracking-tighter font-bold">{order.courier_name}</span>
+                    <span className="text-orange-400 font-bold flex items-center gap-1">
+                      <span className="w-1 h-1 rounded-full bg-orange-400 animate-pulse" />
+                      MOVING
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between text-[10px]">
-                  <span className="text-zinc-600 uppercase tracking-tighter font-bold">{order.courier_name}</span>
-                  <span className="text-orange-400 font-bold flex items-center gap-1">
-                    <span className="w-1 h-1 rounded-full bg-orange-400 animate-pulse" />
-                    IN TRANSIT
-                  </span>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Recently Delivered */}
+        {delivered > 0 && (
+          <div>
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="w-1 h-4 rounded-full bg-emerald-400" />
+              <h2 className="text-sm font-black text-white uppercase tracking-widest">Completed Deliveries</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {orders.filter(o => o.status === 'DELIVERED').slice(0, 4).map(order => (
+                <div key={order._id} className="glass-card p-4 border-emerald-500/10 flex flex-col gap-3 group transition-all hover:translate-y-[-2px]">
+                  <div className="absolute top-0 right-0 w-16 h-16 pointer-events-none opacity-0 group-hover:opacity-10 transition-opacity" style={{ background: 'radial-gradient(circle at top right, #10b981, transparent)' }} />
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-[11px] font-bold text-white group-hover:text-emerald-400 transition-colors uppercase">{order.customer_name}</p>
+                      <p className="text-[9px] text-zinc-500 font-mono italic">{order.tracking_id}</p>
+                    </div>
+                    <CheckCircle2 size={14} className="text-emerald-400" />
+                  </div>
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="text-zinc-600 uppercase tracking-tighter font-bold">{order.courier_name}</span>
+                    <span className="text-emerald-400 font-bold flex items-center gap-1">
+                      <CircleCheckBig size={10} />
+                      SUCCESS
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Table */}
       <div className="glass-card overflow-hidden">
