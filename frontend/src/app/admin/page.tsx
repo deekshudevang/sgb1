@@ -73,14 +73,14 @@ export default function AdminDashboard() {
   const kpis = [
     { l: 'Total Orders', v: total, icon: Boxes, c: 'text-brand-400', bg: 'bg-brand-500/8 border-brand-500/15', g: '#6366f1' },
     { l: 'Pending', v: created, icon: Package, c: 'text-blue-400', bg: 'bg-blue-500/8 border-blue-500/15', g: '#3b82f6' },
-    { l: 'In Transit', v: shipped, icon: Truck, c: 'text-indigo-400', bg: 'bg-indigo-500/8 border-indigo-500/15', g: '#6366f1' },
+    { l: 'In Transit', v: shipped, icon: Truck, c: 'text-yellow-400', bg: 'bg-yellow-500/8 border-yellow-500/15', g: '#eab308' },
     { l: 'Delivered', v: delivered, icon: Clock, c: 'text-emerald-400', bg: 'bg-emerald-500/8 border-emerald-500/15', g: '#10b981' },
   ];
 
   const getStatusBadge = (s: string) => {
     if (s === 'ORDER_CREATED') return <span className="badge badge-created"><span className="w-1 h-1 rounded-full bg-blue-400 animate-pulse" />Created</span>;
     if (s === 'PACKED') return <span className="badge badge-packed" style={{ color: '#fb7185', borderColor: 'rgba(244,63,94,0.2)', backgroundColor: 'rgba(244,63,94,0.05)' }}><span className="w-1 h-1 rounded-full bg-rose-400" />Packed</span>;
-    if (s === 'SHIPPED') return <span className="badge badge-shipped" style={{ color: '#818cf8', borderColor: 'rgba(99,102,241,0.2)', backgroundColor: 'rgba(99,102,241,0.05)' }}><span className="w-1 h-1 rounded-full bg-indigo-400" />In Transit</span>;
+    if (s === 'SHIPPED') return <span className="badge badge-shipped" style={{ color: '#facc15', borderColor: 'rgba(234,179,8,0.2)', backgroundColor: 'rgba(234,179,8,0.05)' }}><span className="w-1 h-1 rounded-full bg-yellow-400" />In Transit</span>;
     if (s === 'DELIVERED') return <span className="badge badge-shipped" style={{ color: '#10b981', borderColor: 'rgba(16,185,129,0.2)', backgroundColor: 'rgba(16,185,129,0.05)' }}><span className="w-1 h-1 rounded-full bg-emerald-400" />Delivered</span>;
   };
 
@@ -133,13 +133,13 @@ export default function AdminDashboard() {
           <div className="flex justify-between text-[10px] font-bold text-zinc-600 uppercase tracking-wider mb-2.5">
             <span className="flex items-center gap-1.5"><Circle size={8} className="text-blue-400 fill-blue-400" />Created ({created})</span>
             <span className="flex items-center gap-1.5"><Circle size={8} className="text-rose-400 fill-rose-400" />Packed ({packed})</span>
-            <span className="flex items-center gap-1.5"><Circle size={8} className="text-indigo-400 fill-indigo-400" />In Transit ({shipped})</span>
+            <span className="flex items-center gap-1.5"><Circle size={8} className="text-yellow-400 fill-yellow-400" />In Transit ({shipped})</span>
             <span className="flex items-center gap-1.5"><Circle size={8} className="text-emerald-400 fill-emerald-400" />Delivered ({delivered})</span>
           </div>
           <div className="flex h-1.5 rounded-full gap-px bg-white/[0.05] overflow-hidden">
             {created > 0 && <div className="h-full rounded-l-full transition-all" style={{ width: `${(created/total)*100}%`, background: 'linear-gradient(90deg, #3b82f6, #6366f1)' }} />}
             {packed > 0 && <div className="h-full transition-all" style={{ width: `${(packed/total)*100}%`, background: '#f43f5e' }} />}
-            {shipped > 0 && <div className="h-full transition-all" style={{ width: `${(shipped/total)*100}%`, background: '#6366f1' }} />}
+            {shipped > 0 && <div className="h-full transition-all" style={{ width: `${(shipped/total)*100}%`, background: '#eab308' }} />}
             {delivered > 0 && <div className="h-full rounded-r-full transition-all" style={{ width: `${(delivered/total)*100}%`, background: 'linear-gradient(90deg, #10b981, #059669)' }} />}
           </div>
         </div>
@@ -150,23 +150,23 @@ export default function AdminDashboard() {
         {shipped > 0 && (
           <div>
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-1 h-4 rounded-full bg-indigo-500" />
+              <div className="w-1 h-4 rounded-full bg-yellow-400" />
               <h2 className="text-sm font-black text-white uppercase tracking-widest">In Transit</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {orders.filter(o => o.status === 'SHIPPED').slice(0, 4).map(order => (
-                <div key={order._id} className="glass-card p-4 border-indigo-500/10 flex flex-col gap-3 group transition-all hover:translate-y-[-2px]">
+                <div key={order._id} className="glass-card p-4 border-yellow-500/10 flex flex-col gap-3 group transition-all hover:translate-y-[-2px]">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="text-[11px] font-bold text-white group-hover:text-indigo-400 transition-colors uppercase">{order.customer_name}</p>
+                      <p className="text-[11px] font-bold text-white group-hover:text-yellow-400 transition-colors uppercase">{order.customer_name}</p>
                       <p className="text-[9px] text-zinc-500 font-mono italic">{order.tracking_id}</p>
                     </div>
-                    <Truck size={14} className="text-indigo-400" />
+                    <Truck size={14} className="text-yellow-400" />
                   </div>
                   <div className="flex items-center justify-between text-[10px]">
                     <span className="text-zinc-600 uppercase tracking-tighter font-bold">{order.courier_name}</span>
-                    <span className="text-indigo-400 font-bold flex items-center gap-1">
-                      <span className="w-1 h-1 rounded-full bg-indigo-400 animate-pulse" />
+                    <span className="text-yellow-400 font-bold flex items-center gap-1">
+                      <span className="w-1 h-1 rounded-full bg-yellow-400 animate-pulse" />
                       MOVING
                     </span>
                   </div>
