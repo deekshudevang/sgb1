@@ -2,7 +2,7 @@
 
 import DashboardLayout from '@/components/DashboardLayout';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import { CreditCard, FileText, ArrowRight, Loader2, Clock, AlertCircle } from 'lucide-react';
 
@@ -16,7 +16,7 @@ export default function BillingDashboard() {
 
   const fetchOrders = async () => {
     try {
-      const { data } = await axios.get('http://localhost:5000/api/orders', {
+      const { data } = await api.get('/orders', {
         headers: { Authorization: `Bearer ${user?.token}` }
       });
       setOrders(data);
@@ -34,13 +34,13 @@ export default function BillingDashboard() {
 
     try {
       // 1. Update billing details
-      await axios.put(`http://localhost:5000/api/orders/${selectedOrder._id}/billing`, {
+      await api.put(`/orders/${selectedOrder._id}/billing`, {
         invoice_id: invoiceId,
         notes: notes
       }, { headers: { Authorization: `Bearer ${user?.token}` } });
 
       // 2. Advance State Machine to BILLING_COMPLETED
-      await axios.put(`http://localhost:5000/api/orders/${selectedOrder._id}/advance`, {
+      await api.put(`/orders/${selectedOrder._id}/advance`, {
         target_status: 'BILLING_COMPLETED'
       }, { headers: { Authorization: `Bearer ${user?.token}` } });
 

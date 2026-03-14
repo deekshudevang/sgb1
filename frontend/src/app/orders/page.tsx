@@ -2,7 +2,7 @@
 
 import DashboardLayout from '@/components/DashboardLayout';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import { Package, Loader2, ArrowLeft, CheckCircle2, User, Phone, MapPin, ChevronDown, IndianRupee, Plus, Trash2, Hash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -56,7 +56,7 @@ export default function OrdersDashboard() {
     const productDetails = items.map(it => `${it.qty}x ${it.product}`).join('\n');
     const notes = `Total: ₹${total || '0'} | Deposit: ₹${deposit || '0'} | Residual: ₹${residual}`;
     try {
-      await axios.post('http://localhost:5000/api/orders', {
+      await api.post('/orders', {
         customer_name: customerName,
         phone_number: phone,
         delivery_address: address,

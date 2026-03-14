@@ -2,7 +2,7 @@
 
 import DashboardLayout from '@/components/DashboardLayout';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import { Box, CheckCircle2, Clock, AlertTriangle, Flame } from 'lucide-react';
 
@@ -14,7 +14,7 @@ export default function PackagingDashboard() {
   const { user } = useAuthStore();
 
   const fetch = async () => {
-    const { data } = await axios.get('http://localhost:5000/api/orders', { headers: { Authorization: `Bearer ${user?.token}` } });
+    const { data } = await api.get('/orders', { headers: { Authorization: `Bearer ${user?.token}` } });
     setOrders(data);
   };
 
@@ -23,7 +23,7 @@ export default function PackagingDashboard() {
   const markPacked = async (id: string) => {
     setPacking(id);
     try {
-      await axios.put(`http://localhost:5000/api/orders/${id}/pack`, {}, { headers: { Authorization: `Bearer ${user?.token}` } });
+      await api.put(`/orders/${id}/pack`, {}, { headers: { Authorization: `Bearer ${user?.token}` } });
       await fetch();
     } finally { setPacking(null); }
   };

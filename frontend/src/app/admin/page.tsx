@@ -2,7 +2,7 @@
 
 import DashboardLayout from '@/components/DashboardLayout';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import { Package, Download, Boxes, Truck, Clock, Search, TrendingUp, Circle, CheckCircle2, CircleCheckBig } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -18,7 +18,7 @@ export default function AdminDashboard() {
 
   const fetchOrders = async () => {
     try {
-      const r = await axios.get('http://localhost:5000/api/orders', {
+      const r = await api.get('/orders', {
         headers: { Authorization: `Bearer ${user?.token}` }
       });
       setOrders(r.data);
@@ -55,7 +55,7 @@ export default function AdminDashboard() {
   }, [search, statusFilter, orders, selectedDate]);
 
   const handleExport = async () => {
-    const r = await axios.get('http://localhost:5000/api/orders/export/csv', {
+    const r = await api.get('/orders/export/csv', {
       headers: { Authorization: `Bearer ${user?.token}` }, responseType: 'blob'
     });
     const url = window.URL.createObjectURL(new Blob([r.data]));

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
-import axios from 'axios';
+import api from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import { Package, Box, Truck, CheckCircle2, ArrowRight, AlertTriangle, Flame } from 'lucide-react';
 
@@ -26,7 +26,7 @@ export default function WorkflowMap() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data } = await axios.get('http://localhost:5000/api/orders', {
+        const { data } = await api.get('/orders', {
           headers: { Authorization: `Bearer ${user?.token}` }
         });
         const created = data.filter((o: any) => o.status === 'ORDER_CREATED').length;

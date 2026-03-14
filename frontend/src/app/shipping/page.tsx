@@ -2,7 +2,7 @@
 
 import DashboardLayout from '@/components/DashboardLayout';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import { Truck, SendHorizonal, PackageCheck, Loader2, Clock, CheckCircle2, CircleCheckBig } from 'lucide-react';
 
@@ -14,7 +14,7 @@ export default function ShippingDashboard() {
 
   // ── Fetch orders ──
   const fetchOrders = async () => {
-    const { data } = await axios.get('http://localhost:5000/api/orders', { headers: { Authorization: `Bearer ${user?.token}` } });
+    const { data } = await api.get('/orders', { headers: { Authorization: `Bearer ${user?.token}` } });
     setOrders(data);
     const init: any = {};
     data.forEach((o: any) => { init[o._id] = { courier_name: '', tracking_id: '' }; });
@@ -28,7 +28,7 @@ export default function ShippingDashboard() {
     setShipping(id);
     try { 
       // Aligned with New Unified Shipping API
-      await axios.post(`http://localhost:5000/api/shipping/ship`, {
+      await api.post(`/shipping/ship`, {
         orderId: id,
         courier: f.courier_name,
         trackingId: f.tracking_id
@@ -49,7 +49,7 @@ export default function ShippingDashboard() {
   const [delivering, setDelivering] = useState<string | null>(null);
   const markDelivered = async (id: string) => {
     setDelivering(id);
-    try { await axios.put(`http://localhost:5000/api/orders/${id}/deliver`, {}, { headers: { Authorization: `Bearer ${user?.token}` } }); await fetchOrders(); }
+    try { await api.put(`/orders/${id}/deliver`, {}, { headers: { Authorization: `Bearer ${user?.token}` } }); await fetchOrders(); }
     finally { setDelivering(null); }
   };
 

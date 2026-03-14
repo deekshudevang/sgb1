@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
+import api from '@/lib/api';
 import Link from 'next/link';
 import { Eye, EyeOff, Loader2, ArrowRight, ArrowLeft, CheckCircle2, KeyRound } from 'lucide-react';
 
@@ -38,7 +38,7 @@ export default function SignUpPage() {
     if (!form.secretKey) { setError('Secret key is required.'); return; }
     setLoading(true); setError('');
     try {
-      await axios.post('http://localhost:5000/api/users/register', {
+      await api.post('/users/register', {
         email: form.email, password: form.password, role: form.role, secretKey: form.secretKey,
       });
       setSuccess(true);

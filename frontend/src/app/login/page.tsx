@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
-import axios from 'axios';
+import api from '@/lib/api';
 import Link from 'next/link';
 import { Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
 
@@ -23,7 +23,7 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true); setError('');
     try {
-      const { data } = await axios.post('http://localhost:5000/api/users/login', { email, password });
+      const { data } = await api.post('/users/login', { email, password });
       setUser(data);
       const r: Record<string, string> = {
         ADMIN: '/admin', PACKAGING: '/packaging', SHIPMENT: '/shipping',
