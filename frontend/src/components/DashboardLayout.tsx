@@ -52,7 +52,7 @@ function LiveClock() {
   );
 }
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({ children, sidebarActions }: { children: React.ReactNode; sidebarActions?: React.ReactNode }) {
   const { user, setUser, logout } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
@@ -141,6 +141,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </Link>
             );
           })}
+          
+          {/* Sidebar Action Area (Dynamic) */}
+          {!collapsed && sidebarActions && (
+            <div className="mt-6 px-1.5 space-y-2.5 animate-in fade-in slide-in-from-left-2 duration-500">
+              <div className="h-px w-full bg-white/[0.04] mb-4" />
+              {sidebarActions}
+            </div>
+          )}
         </nav>
 
         {/* User footer */}

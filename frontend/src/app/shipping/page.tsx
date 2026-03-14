@@ -57,34 +57,44 @@ export default function ShippingDashboard() {
   const dispatchedOrders = orders.filter(o => o.status === 'SHIPPED');
   const deliveredOrders = orders.filter(o => o.status === 'DELIVERED');
 
+  const sidebarActions = (
+    <>
+      <button 
+        onClick={() => {
+          const el = document.getElementById('pending-dispatch');
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }}
+        className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-[10px] font-black text-amber-500 uppercase tracking-[0.15em] hover:bg-amber-500/20 transition-all shadow-lg shadow-amber-500/5 group"
+      >
+        <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
+        <span className="flex-1 text-left">Access Dispatch</span>
+        <span className="bg-amber-500/20 px-2 py-0.5 rounded-md font-mono text-[9px] text-amber-400/80 border border-amber-500/10">{pendingOrders.length}</span>
+      </button>
+      
+      <button 
+        onClick={() => {
+          const el = document.getElementById('operational-workspace');
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }}
+        className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black text-indigo-400 uppercase tracking-[0.15em] hover:bg-indigo-500/20 transition-all shadow-lg shadow-indigo-500/5 group"
+      >
+        <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse shadow-[0_0_8px_rgba(99,102,241,0.6)]" />
+        <span className="flex-1 text-left">Live Workshop</span>
+      </button>
+    </>
+  );
+
   return (
-    <DashboardLayout>
-      <div className="flex flex-wrap justify-between items-start gap-4 mb-8 animate-fade-in-up">
-        <div>
+    <DashboardLayout sidebarActions={sidebarActions}>
+      <div className="flex flex-wrap justify-between items-start gap-4 mb-10 animate-fade-in-up">
+        <div className="flex-1 min-w-[300px]">
           <div className="flex items-center gap-2.5 mb-2">
             <div className="w-1.5 h-5 rounded-full bg-rose-400" />
             <h1 className="text-2xl font-black text-white tracking-tight">Shipping Deck</h1>
           </div>
-          <p className="text-sm text-zinc-500 mb-4">Order dispatch & delivery management</p>
-          
-          <div className="flex gap-3 mt-2">
-            <button 
-              onClick={() => document.getElementById('pending-dispatch')?.scrollIntoView({ behavior: 'smooth' })}
-              className="px-5 py-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-[10px] font-black text-amber-500 uppercase tracking-[0.15em] hover:bg-amber-500/20 transition-all flex items-center gap-2 group"
-            >
-              <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-              Access Pending Dispatch
-              <span className="bg-amber-500/20 px-2 py-0.5 rounded-md ml-1 group-hover:bg-amber-500/30 transition-colors">{pendingOrders.length}</span>
-            </button>
-            <button 
-              onClick={() => document.getElementById('operational-workspace')?.scrollIntoView({ behavior: 'smooth' })}
-              className="px-5 py-2.5 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black text-indigo-400 uppercase tracking-[0.15em] hover:bg-indigo-500/20 transition-all flex items-center gap-2 group"
-            >
-              <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
-              Live Workspace
-            </button>
-          </div>
+          <p className="text-sm text-zinc-500">Order dispatch & delivery management</p>
         </div>
+
         <div className="flex items-center gap-3">
           <div className="glass-card px-4 py-2 text-center">
             <div className="text-lg font-black text-amber-400 leading-none">{pendingOrders.length}</div>
@@ -147,13 +157,15 @@ export default function ShippingDashboard() {
                 </div>
               </div>
 
-              <button onClick={() => markDelivered(order._id)} disabled={delivering === order._id}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-[11px] font-black text-white uppercase tracking-widest transition-all duration-300 relative overflow-hidden group/btn"
-                style={{ background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', boxShadow: '0 4px 15px rgba(16,185,129,0.2)' }}>
-                <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-500" />
-                {delivering === order._id ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
-                {delivering === order._id ? 'Verifying...' : 'Complete Delivery'}
-              </button>
+              <div className="flex justify-end mt-2">
+                <button onClick={() => markDelivered(order._id)} disabled={delivering === order._id}
+                  className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-[11px] font-black text-white uppercase tracking-widest transition-all duration-300 relative overflow-hidden group/btn"
+                  style={{ background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', boxShadow: '0 4px 15px rgba(16,185,129,0.2)' }}>
+                  <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-500" />
+                  {delivering === order._id ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
+                  {delivering === order._id ? 'Verifying...' : 'Complete Delivery'}
+                </button>
+              </div>
             </div>
           ))}
           {dispatchedOrders.length === 0 && (
